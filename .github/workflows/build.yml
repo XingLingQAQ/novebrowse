@@ -30,6 +30,7 @@ jobs:
 
       - name: Run build script
         shell: pwsh
+        working-directory: ${{ github.workspace }}\browse\novebrowse
         run: |
           python .\scripts\build.py
 
@@ -38,6 +39,6 @@ jobs:
         with:
           name: novebrowse-windows-launcher
           path: |
-            build/artifacts/build_novebrowse.exe
+            browse\novebrowse\artifacts\build_novebrowse.exe
 
 
