@@ -1,0 +1,43 @@
+name: NoveBrowse Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'novebrowse/**'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Add Git config recommended by depot_tools
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.filemode false
+          git config --global core.fscache true
+          git config --global core.preloadindex true
+
+      - name: Run build script
+        shell: pwsh
+        run: |
+          python .\scripts\build.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: novebrowse-windows-launcher
+          path: |
+            build/artifacts/build_novebrowse.exe
+
+

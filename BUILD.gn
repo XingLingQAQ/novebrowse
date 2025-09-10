@@ -1,0 +1,215 @@
+# Copyright 2024 The NoveBrowse Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/config/features.gni")
+import("//mojo/public/tools/bindings/mojom.gni")
+
+# NoveBrowse fingerprint protection component
+component("fingerprint_protection") {
+  sources = [
+    "src/fingerprint_manager.cc",
+    "src/fingerprint_manager.h",
+    "src/fingerprint_config.cc",
+    "src/fingerprint_config.h",
+    "src/canvas_fingerprint_protection.cc",
+    "src/canvas_fingerprint_protection.h",
+    "src/webgl_fingerprint_protection.cc",
+    "src/webgl_fingerprint_protection.h",
+    "src/blink_fingerprint_manager.cc",
+    "src/blink_fingerprint_manager.h",
+  ]
+
+  deps = [
+    ":fingerprint_mojom",
+    "//base",
+    "//content/public/browser",
+    "//content/public/renderer",
+    "//third_party/blink/public:blink",
+    "//third_party/blink/renderer/core",
+    "//third_party/blink/renderer/modules",
+    "//third_party/blink/renderer/platform",
+    "//third_party/skia",
+    "//crypto",
+    "//v8",
+  ]
+
+  public_deps = [
+    "//base",
+    "//content/public/browser",
+  ]
+
+  defines = [ "NOVEBROWSE_FINGERPRINT_IMPLEMENTATION" ]
+
+  # Include paths
+  include_dirs = [
+    "//",
+    "//novebrowse",
+  ]
+
+  # Configuration files
+  data = [
+    "config/fingerprint_config.json",
+    "config/device_profiles.json",
+    "config/behavior_patterns.json",
+  ]
+}
+
+# Mojo interfaces for fingerprint protection
+mojom("fingerprint_mojom") {
+  sources = [
+    "mojom/fingerprint.mojom",
+  ]
+
+  public_deps = [
+    "//mojo/public/mojom/base",
+  ]
+
+  cpp_typemaps = [
+    {
+      types = [
+        {
+          mojom = "novebrowse.mojom.FingerprintConfig"
+          cpp = "::novebrowse::FingerprintConfig"
+        },
+      ]
+      traits_headers = [ "src/fingerprint_config.h" ]
+    },
+  ]
+}
+
+# Browser process integration
+source_set("browser_integration") {
+  sources = [
+    "browser/fingerprint_browser_client.cc",
+    "browser/fingerprint_browser_client.h",
+    "browser/fingerprint_content_browser_client.cc",
+    "browser/fingerprint_content_browser_client.h",
+  ]
+
+  deps = [
+    ":fingerprint_protection",
+    "//content/public/browser",
+    "//content/browser",
+  ]
+}
+
+# Renderer process integration
+source_set("renderer_integration") {
+  sources = [
+    "renderer/fingerprint_renderer_client.cc",
+    "renderer/fingerprint_renderer_client.h",
+    "renderer/fingerprint_content_renderer_client.cc",
+    "renderer/fingerprint_content_renderer_client.h",
+  ]
+
+  deps = [
+    ":fingerprint_protection",
+    "//content/public/renderer",
+    "//content/renderer",
+    "//third_party/blink/public:blink",
+  ]
+}
+
+# Unit tests
+test("novebrowse_fingerprint_unittests") {
+  sources = [
+    "test/fingerprint_manager_unittest.cc",
+    "test/canvas_fingerprint_protection_unittest.cc",
+    "test/webgl_fingerprint_protection_unittest.cc",
+    "test/blink_fingerprint_manager_unittest.cc",
+  ]
+
+  deps = [
+    ":fingerprint_protection",
+    "//base/test:test_support",
+    "//content/test:test_support",
+    "//testing/gtest",
+    "//testing/gmock",
+  ]
+
+  data = [
+    "test/data/",
+  ]
+}
+
+# Browser tests
+test("novebrowse_fingerprint_browsertests") {
+  sources = [
+    "test/fingerprint_browser_test.cc",
+    "test/canvas_fingerprint_browser_test.cc",
+    "test/webgl_fingerprint_browser_test.cc",
+  ]
+
+  deps = [
+    ":fingerprint_protection",
+    "//content/test:test_support",
+    "//content/public/test:test_support",
+    "//testing/gtest",
+  ]
+
+  data = [
+    "test/data/",
+    "config/",
+  ]
+}
+
+# Configuration and resource files
+copy("config_files") {
+  sources = [
+    "config/fingerprint_config.json",
+    "config/device_profiles.json",
+    "config/behavior_patterns.json",
+  ]
+
+  outputs = [
+    "$root_out_dir/novebrowse_config/{{source_file_part}}",
+  ]
+}
+
+# Build script for custom browser
+executable("build_novebrowse") {
+  sources = [
+    "build/build_main.cc",
+  ]
+
+  deps = [
+    "//base",
+    "//build/config:exe_and_shlib_deps",
+  ]
+
+  data_deps = [
+    ":config_files",
+  ]
+
+  if (is_win) {
+    include_dirs = [ "//novebrowse" ]
+    libs = [ "shlwapi.lib" ]
+    # Ensure Windows headers and COM APIs available
+    configs += [ "//build/config/win:common_controls_manifest" ]
+  }
+}
+
+# Installation package
+group("novebrowse_package") {
+  deps = [
+    ":fingerprint_protection",
+    ":browser_integration",
+    ":renderer_integration",
+    ":config_files",
+  ]
+
+  if (is_debug) {
+    deps += [
+      ":novebrowse_fingerprint_unittests",
+      ":novebrowse_fingerprint_browsertests",
+    ]
+  }
+}
+
+# Default target
+group("default") {
+  deps = [
+    ":novebrowse_package",
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "profiles": {
+    "windows_desktop": {
+      "name": "Windows Desktop",
+      "description": "Standard Windows 10/11 desktop configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "Win32",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 8,
+        "device_memory": 8
+      },
+      "screen": {
+        "width": 1920,
+        "height": 1080,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 1.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "windows_laptop": {
+      "name": "Windows Laptop",
+      "description": "Windows laptop with integrated graphics",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "Win32",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 4,
+        "device_memory": 4
+      },
+      "screen": {
+        "width": 1366,
+        "height": 768,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 1.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Intel(R) HD Graphics 520 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    },
+    "macos_desktop": {
+      "name": "macOS Desktop",
+      "description": "macOS desktop configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "MacIntel",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 8,
+        "device_memory": 16
+      },
+      "screen": {
+        "width": 2560,
+        "height": 1440,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 2.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, Apple M1 Pro, OpenGL 4.1)"
+      }
+    },
+    "linux_desktop": {
+      "name": "Linux Desktop",
+      "description": "Ubuntu Linux desktop configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "Linux x86_64",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 6,
+        "device_memory": 8
+      },
+      "screen": {
+        "width": 1920,
+        "height": 1080,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 1.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce GTX 1060/PCIe/SSE2, OpenGL 4.5.0)"
+      }
+    },
+    "android_mobile": {
+      "name": "Android Mobile",
+      "description": "Android mobile device configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+        "platform": "Linux armv8l",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 8,
+        "device_memory": 6
+      },
+      "screen": {
+        "width": 412,
+        "height": 915,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 2.625
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Qualcomm)",
+        "renderer": "ANGLE (Qualcomm, Adreno (TM) 660, OpenGL ES 3.2)"
+      }
+    },
+    "iphone": {
+      "name": "iPhone",
+      "description": "iPhone mobile device configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0.0.0 Mobile/15E148 Safari/604.1",
+        "platform": "iPhone",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 6,
+        "device_memory": 4
+      },
+      "screen": {
+        "width": 390,
+        "height": 844,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 3.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Apple)",
+        "renderer": "ANGLE (Apple, Apple A15 Bionic GPU, OpenGL ES 3.0)"
+      }
+    },
+    "windows_gaming": {
+      "name": "Windows Gaming PC",
+      "description": "High-end Windows gaming configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "Win32",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 16,
+        "device_memory": 32
+      },
+      "screen": {
+        "width": 3840,
+        "height": 2160,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 1.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (NVIDIA Corporation)",
+        "renderer": "ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 4080/PCIe/SSE2, OpenGL 4.6.0)"
+      }
+    },
+    "windows_office": {
+      "name": "Windows Office PC",
+      "description": "Standard office workstation configuration",
+      "navigator": {
+        "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "platform": "Win32",
+        "languages": ["en-US", "en"],
+        "hardware_concurrency": 4,
+        "device_memory": 8
+      },
+      "screen": {
+        "width": 1600,
+        "height": 900,
+        "color_depth": 24,
+        "pixel_depth": 24,
+        "device_pixel_ratio": 1.0
+      },
+      "webgl": {
+        "vendor": "Google Inc. (Intel)",
+        "renderer": "ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)"
+      }
+    }
+  },
+  "common_fonts": {
+    "windows": [
+      "Arial", "Arial Black", "Calibri", "Cambria", "Comic Sans MS",
+      "Consolas", "Courier New", "Georgia", "Impact", "Lucida Console",
+      "Lucida Sans Unicode", "Microsoft Sans Serif", "Palatino Linotype",
+      "Segoe UI", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"
+    ],
+    "macos": [
+      "American Typewriter", "Andale Mono", "Arial", "Arial Black",
+      "Arial Narrow", "Arial Rounded MT Bold", "Arial Unicode MS",
+      "Avenir", "Avenir Next", "Baskerville", "Big Caslon", "Bodoni 72",
+      "Bradley Hand", "Brush Script MT", "Chalkboard", "Chalkboard SE",
+      "Chalkduster", "Charter", "Cochin", "Comic Sans MS", "Copperplate",
+      "Courier", "Courier New", "Didot", "DIN Alternate", "DIN Condensed",
+      "Futura", "Geneva", "Georgia", "Gill Sans", "Helvetica",
+      "Helvetica Neue", "Herculanum", "Hoefler Text", "Impact",
+      "Lucida Grande", "Luminari", "Marker Felt", "Menlo", "Monaco",
+      "Noteworthy", "Optima", "Palatino", "Papyrus", "Phosphate",
+      "Rockwell", "Savoye LET", "SignPainter", "Skia", "Snell Roundhand",
+      "Tahoma", "Times", "Times New Roman", "Trattatello", "Trebuchet MS",
+      "Verdana", "Zapfino"
+    ],
+    "linux": [
+      "Abyssinica SIL", "DejaVu Sans", "DejaVu Sans Mono", "DejaVu Serif",
+      "Droid Sans", "Droid Sans Mono", "Droid Serif", "FreeMono",
+      "FreeSans", "FreeSerif", "Liberation Mono", "Liberation Sans",
+      "Liberation Serif", "Lohit Devanagari", "Lohit Gujarati",
+      "Lohit Hindi", "Lohit Punjabi", "Lohit Tamil", "Lohit Telugu",
+      "Noto Color Emoji", "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR",
+      "Noto Sans CJK SC", "Noto Sans CJK TC", "Noto Serif", "Ubuntu",
+      "Ubuntu Condensed", "Ubuntu Mono"
+    ]
+  },
+  "webgl_extensions": {
+    "intel_integrated": [
+      "ANGLE_instanced_arrays", "EXT_blend_minmax", "EXT_color_buffer_half_float",
+      "EXT_disjoint_timer_query", "EXT_frag_depth", "EXT_shader_texture_lod",
+      "EXT_texture_filter_anisotropic", "EXT_sRGB", "OES_element_index_uint",
+      "OES_standard_derivatives", "OES_texture_float", "OES_texture_half_float",
+      "OES_vertex_array_object", "WEBGL_color_buffer_float", "WEBGL_compressed_texture_s3tc",
+      "WEBGL_debug_renderer_info", "WEBGL_debug_shaders", "WEBGL_depth_texture",
+      "WEBGL_draw_buffers", "WEBGL_lose_context"
+    ],
+    "nvidia_discrete": [
+      "ANGLE_instanced_arrays", "EXT_blend_minmax", "EXT_color_buffer_float",
+      "EXT_color_buffer_half_float", "EXT_disjoint_timer_query", "EXT_float_blend",
+      "EXT_frag_depth", "EXT_shader_texture_lod", "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc", "EXT_texture_filter_anisotropic",
+      "EXT_sRGB", "OES_element_index_uint", "OES_fbo_render_mipmap",
+      "OES_standard_derivatives", "OES_texture_float", "OES_texture_float_linear",
+      "OES_texture_half_float", "OES_texture_half_float_linear", "OES_vertex_array_object",
+      "WEBGL_color_buffer_float", "WEBGL_compressed_texture_astc", "WEBGL_compressed_texture_etc",
+      "WEBGL_compressed_texture_etc1", "WEBGL_compressed_texture_pvrtc",
+      "WEBGL_compressed_texture_s3tc", "WEBGL_compressed_texture_s3tc_srgb",
+      "WEBGL_debug_renderer_info", "WEBGL_debug_shaders", "WEBGL_depth_texture",
+      "WEBGL_draw_buffers", "WEBGL_lose_context", "WEBGL_multi_draw"
+    ],
+    "amd_discrete": [
+      "ANGLE_instanced_arrays", "EXT_blend_minmax", "EXT_color_buffer_float",
+      "EXT_color_buffer_half_float", "EXT_disjoint_timer_query", "EXT_float_blend",
+      "EXT_frag_depth", "EXT_shader_texture_lod", "EXT_texture_compression_bptc",
+      "EXT_texture_compression_rgtc", "EXT_texture_filter_anisotropic",
+      "EXT_sRGB", "OES_element_index_uint", "OES_fbo_render_mipmap",
+      "OES_standard_derivatives", "OES_texture_float", "OES_texture_float_linear",
+      "OES_texture_half_float", "OES_texture_half_float_linear", "OES_vertex_array_object",
+      "WEBGL_color_buffer_float", "WEBGL_compressed_texture_s3tc",
+      "WEBGL_compressed_texture_s3tc_srgb", "WEBGL_debug_renderer_info",
+      "WEBGL_debug_shaders", "WEBGL_depth_texture", "WEBGL_draw_buffers",
+      "WEBGL_lose_context"
+    ]
+  }
+}

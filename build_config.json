@@ -1,0 +1,155 @@
+{
+  "project_name": "NoveBrowse",
+  "version": "1.0.0",
+  "chromium_version": "120.0.6099.109",
+  "build_config": {
+    "target_os": "win",
+    "target_cpu": "x64",
+    "is_debug": false,
+    "is_component_build": false,
+    "symbol_level": 1,
+    "enable_nacl": false,
+    "enable_widevine": false,
+    "proprietary_codecs": true,
+    "ffmpeg_branding": "Chrome",
+    "use_custom_libcxx": true,
+    "use_sysroot": false,
+    "treat_warnings_as_errors": false,
+    "enable_iterator_debugging": false
+  },
+  "custom_features": {
+    "fingerprint_spoofing": true,
+    "webdriver_hiding": true,
+    "automation_detection_blocking": true,
+    "canvas_noise_injection": true,
+    "webgl_parameter_spoofing": true,
+    "audio_fingerprint_protection": true,
+    "font_enumeration_spoofing": true,
+    "webrtc_ip_masking": true,
+    "geolocation_spoofing": true,
+    "timezone_spoofing": true,
+    "language_spoofing": true,
+    "user_agent_spoofing": true,
+    "screen_resolution_spoofing": true,
+    "hardware_concurrency_spoofing": true,
+    "device_memory_spoofing": true,
+    "battery_api_blocking": true,
+    "permissions_api_spoofing": true
+  },
+  "patches": [
+    {
+      "name": "fingerprint_core",
+      "description": "Core fingerprint spoofing infrastructure",
+      "files": [
+        "content/browser/renderer_host/render_frame_host_impl.cc",
+        "content/renderer/render_frame_impl.cc",
+        "third_party/blink/renderer/core/frame/navigator.cc",
+        "third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc",
+        "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc"
+      ]
+    },
+    {
+      "name": "webdriver_detection",
+      "description": "WebDriver and automation detection blocking",
+      "files": [
+        "chrome/renderer/chrome_content_renderer_client.cc",
+        "content/renderer/render_frame_impl.cc",
+        "third_party/blink/renderer/core/frame/navigator.cc"
+      ]
+    },
+    {
+      "name": "canvas_protection",
+      "description": "Canvas fingerprint protection with noise injection",
+      "files": [
+        "third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc",
+        "third_party/blink/renderer/core/html/canvas/image_data.cc",
+        "third_party/blink/renderer/platform/graphics/canvas_2d_layer_bridge.cc"
+      ]
+    },
+    {
+      "name": "webgl_protection",
+      "description": "WebGL parameter spoofing and fingerprint protection",
+      "files": [
+        "third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc",
+        "third_party/blink/renderer/modules/webgl/webgl_rendering_context.cc",
+        "third_party/blink/renderer/modules/webgl/webgl2_rendering_context.cc"
+      ]
+    },
+    {
+      "name": "audio_protection",
+      "description": "Audio context fingerprint protection",
+      "files": [
+        "third_party/blink/renderer/modules/webaudio/audio_context.cc",
+        "third_party/blink/renderer/modules/webaudio/offline_audio_context.cc",
+        "third_party/blink/renderer/modules/webaudio/analyser_node.cc"
+      ]
+    },
+    {
+      "name": "font_protection",
+      "description": "Font enumeration and metrics spoofing",
+      "files": [
+        "third_party/blink/renderer/platform/fonts/font_cache.cc",
+        "third_party/blink/renderer/core/css/css_font_face_source.cc",
+        "third_party/blink/renderer/platform/fonts/font_platform_data.cc"
+      ]
+    },
+    {
+      "name": "webrtc_protection",
+      "description": "WebRTC IP address masking and protection",
+      "files": [
+        "third_party/webrtc/pc/peer_connection.cc",
+        "third_party/webrtc/p2p/base/basic_packet_socket_factory.cc",
+        "content/renderer/media/webrtc/rtc_peer_connection_handler.cc"
+      ]
+    },
+    {
+      "name": "geolocation_protection",
+      "description": "Geolocation API spoofing",
+      "files": [
+        "third_party/blink/renderer/modules/geolocation/geolocation.cc",
+        "content/browser/geolocation/geolocation_service_impl.cc"
+      ]
+    },
+    {
+      "name": "navigator_protection",
+      "description": "Navigator object properties spoofing",
+      "files": [
+        "third_party/blink/renderer/core/frame/navigator.cc",
+        "third_party/blink/renderer/core/frame/navigator_id.cc",
+        "third_party/blink/renderer/core/frame/navigator_language.cc"
+      ]
+    },
+    {
+      "name": "screen_protection",
+      "description": "Screen properties spoofing",
+      "files": [
+        "third_party/blink/renderer/core/frame/screen.cc",
+        "third_party/blink/renderer/core/frame/visual_viewport.cc"
+      ]
+    }
+  ],
+  "config_files": [
+    {
+      "name": "fingerprint_config.json",
+      "description": "Runtime fingerprint configuration",
+      "location": "novebrowse/config/"
+    },
+    {
+      "name": "device_profiles.json",
+      "description": "Device profile templates",
+      "location": "novebrowse/config/"
+    },
+    {
+      "name": "behavior_patterns.json",
+      "description": "User behavior simulation patterns",
+      "location": "novebrowse/config/"
+    }
+  ],
+  "build_steps": [
+    "fetch_chromium_source",
+    "apply_patches",
+    "configure_build",
+    "compile_browser",
+    "package_distribution"
+  ]
+}

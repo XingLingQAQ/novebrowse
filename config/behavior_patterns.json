@@ -1,0 +1,296 @@
+{
+  "patterns": {
+    "normal_user": {
+      "name": "Normal User",
+      "description": "Typical human browsing behavior patterns",
+      "mouse": {
+        "movement_speed": 1.0,
+        "click_delay_ms": 150.0,
+        "add_random_movements": true,
+        "random_movement_probability": 0.15,
+        "movement_curve": "bezier",
+        "pause_between_movements": true,
+        "pause_duration_range": [50, 200]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 65.0,
+        "key_press_delay_ms": 80.0,
+        "add_typing_errors": true,
+        "error_probability": 0.02,
+        "backspace_correction": true,
+        "natural_pauses": true,
+        "pause_probability": 0.1
+      },
+      "scroll": {
+        "scroll_speed": 1.0,
+        "smooth_scrolling": true,
+        "pause_probability": 0.25,
+        "pause_duration_ms": 800,
+        "variable_speed": true,
+        "acceleration": 0.8
+      },
+      "interaction": {
+        "page_dwell_time_ms": 4500.0,
+        "simulate_reading": true,
+        "reading_speed_wpm": 250.0,
+        "link_click_probability": 0.75,
+        "form_fill_speed": 1.2,
+        "tab_switching_probability": 0.1,
+        "back_button_probability": 0.15
+      }
+    },
+    "fast_user": {
+      "name": "Fast User",
+      "description": "Power user with quick navigation patterns",
+      "mouse": {
+        "movement_speed": 1.8,
+        "click_delay_ms": 80.0,
+        "add_random_movements": true,
+        "random_movement_probability": 0.08,
+        "movement_curve": "linear",
+        "pause_between_movements": false,
+        "pause_duration_range": [20, 80]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 95.0,
+        "key_press_delay_ms": 45.0,
+        "add_typing_errors": true,
+        "error_probability": 0.015,
+        "backspace_correction": true,
+        "natural_pauses": false,
+        "pause_probability": 0.05
+      },
+      "scroll": {
+        "scroll_speed": 1.6,
+        "smooth_scrolling": false,
+        "pause_probability": 0.1,
+        "pause_duration_ms": 300,
+        "variable_speed": true,
+        "acceleration": 1.2
+      },
+      "interaction": {
+        "page_dwell_time_ms": 2200.0,
+        "simulate_reading": true,
+        "reading_speed_wpm": 400.0,
+        "link_click_probability": 0.9,
+        "form_fill_speed": 2.0,
+        "tab_switching_probability": 0.25,
+        "back_button_probability": 0.05
+      }
+    },
+    "careful_user": {
+      "name": "Careful User",
+      "description": "Cautious user with deliberate browsing patterns",
+      "mouse": {
+        "movement_speed": 0.6,
+        "click_delay_ms": 300.0,
+        "add_random_movements": true,
+        "random_movement_probability": 0.25,
+        "movement_curve": "ease_in_out",
+        "pause_between_movements": true,
+        "pause_duration_range": [100, 400]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 35.0,
+        "key_press_delay_ms": 120.0,
+        "add_typing_errors": true,
+        "error_probability": 0.03,
+        "backspace_correction": true,
+        "natural_pauses": true,
+        "pause_probability": 0.2
+      },
+      "scroll": {
+        "scroll_speed": 0.7,
+        "smooth_scrolling": true,
+        "pause_probability": 0.4,
+        "pause_duration_ms": 1500,
+        "variable_speed": true,
+        "acceleration": 0.5
+      },
+      "interaction": {
+        "page_dwell_time_ms": 8000.0,
+        "simulate_reading": true,
+        "reading_speed_wpm": 180.0,
+        "link_click_probability": 0.6,
+        "form_fill_speed": 0.8,
+        "tab_switching_probability": 0.05,
+        "back_button_probability": 0.25
+      }
+    },
+    "mobile_user": {
+      "name": "Mobile User",
+      "description": "Touch-based mobile browsing patterns",
+      "mouse": {
+        "movement_speed": 0.8,
+        "click_delay_ms": 200.0,
+        "add_random_movements": false,
+        "random_movement_probability": 0.0,
+        "movement_curve": "touch",
+        "pause_between_movements": true,
+        "pause_duration_range": [150, 300]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 25.0,
+        "key_press_delay_ms": 180.0,
+        "add_typing_errors": true,
+        "error_probability": 0.05,
+        "backspace_correction": true,
+        "natural_pauses": true,
+        "pause_probability": 0.15
+      },
+      "scroll": {
+        "scroll_speed": 1.2,
+        "smooth_scrolling": true,
+        "pause_probability": 0.3,
+        "pause_duration_ms": 600,
+        "variable_speed": true,
+        "acceleration": 0.9,
+        "momentum_scrolling": true
+      },
+      "interaction": {
+        "page_dwell_time_ms": 3500.0,
+        "simulate_reading": true,
+        "reading_speed_wpm": 200.0,
+        "link_click_probability": 0.8,
+        "form_fill_speed": 0.6,
+        "tab_switching_probability": 0.15,
+        "back_button_probability": 0.2
+      }
+    },
+    "elderly_user": {
+      "name": "Elderly User",
+      "description": "Slower, more deliberate browsing patterns",
+      "mouse": {
+        "movement_speed": 0.4,
+        "click_delay_ms": 500.0,
+        "add_random_movements": true,
+        "random_movement_probability": 0.3,
+        "movement_curve": "ease_in_out",
+        "pause_between_movements": true,
+        "pause_duration_range": [200, 600]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 20.0,
+        "key_press_delay_ms": 200.0,
+        "add_typing_errors": true,
+        "error_probability": 0.04,
+        "backspace_correction": true,
+        "natural_pauses": true,
+        "pause_probability": 0.25
+      },
+      "scroll": {
+        "scroll_speed": 0.5,
+        "smooth_scrolling": true,
+        "pause_probability": 0.5,
+        "pause_duration_ms": 2000,
+        "variable_speed": false,
+        "acceleration": 0.3
+      },
+      "interaction": {
+        "page_dwell_time_ms": 12000.0,
+        "simulate_reading": true,
+        "reading_speed_wpm": 150.0,
+        "link_click_probability": 0.5,
+        "form_fill_speed": 0.5,
+        "tab_switching_probability": 0.02,
+        "back_button_probability": 0.3
+      }
+    },
+    "gaming_user": {
+      "name": "Gaming User",
+      "description": "High-precision, fast reaction patterns",
+      "mouse": {
+        "movement_speed": 2.2,
+        "click_delay_ms": 50.0,
+        "add_random_movements": false,
+        "random_movement_probability": 0.02,
+        "movement_curve": "linear",
+        "pause_between_movements": false,
+        "pause_duration_range": [10, 30]
+      },
+      "keyboard": {
+        "typing_speed_wpm": 85.0,
+        "key_press_delay_ms": 35.0,
+        "add_typing_errors": true,
+        "error_probability": 0.01,
+        "backspace_correction": true,
+        "natural_pauses": false,
+        "pause_probability": 0.03
+      },
+      "scroll": {
+        "scroll_speed": 2.0,
+        "smooth_scrolling": false,
+        "pause_probability": 0.05,
+        "pause_duration_ms": 200,
+        "variable_speed": true,
+        "acceleration": 1.5
+      },
+      "interaction": {
+        "page_dwell_time_ms": 1800.0,
+        "simulate_reading": false,
+        "reading_speed_wpm": 500.0,
+        "link_click_probability": 0.95,
+        "form_fill_speed": 2.5,
+        "tab_switching_probability": 0.4,
+        "back_button_probability": 0.02
+      }
+    }
+  },
+  "timing_variations": {
+    "human_delays": {
+      "min_action_delay": 50,
+      "max_action_delay": 300,
+      "network_delay_simulation": true,
+      "cpu_load_simulation": true,
+      "memory_pressure_simulation": false
+    },
+    "randomization": {
+      "timing_variance": 0.2,
+      "sequence_variance": 0.1,
+      "behavioral_drift": 0.05,
+      "fatigue_simulation": true,
+      "attention_span_simulation": true
+    }
+  },
+  "detection_evasion": {
+    "mouse_tracking": {
+      "avoid_perfect_lines": true,
+      "add_micro_movements": true,
+      "simulate_hand_tremor": true,
+      "tremor_frequency": 0.1,
+      "tremor_amplitude": 2.0
+    },
+    "timing_analysis": {
+      "avoid_constant_intervals": true,
+      "add_processing_delays": true,
+      "simulate_decision_time": true,
+      "vary_reaction_times": true
+    },
+    "behavioral_consistency": {
+      "maintain_user_profile": true,
+      "gradual_behavior_changes": true,
+      "context_aware_adjustments": true,
+      "learning_simulation": false
+    }
+  },
+  "advanced_patterns": {
+    "attention_simulation": {
+      "focus_duration_ms": 45000,
+      "distraction_probability": 0.1,
+      "multitasking_probability": 0.15,
+      "tab_switching_patterns": "realistic"
+    },
+    "reading_simulation": {
+      "eye_movement_patterns": true,
+      "reading_comprehension_pauses": true,
+      "re_reading_probability": 0.08,
+      "scanning_vs_reading": "adaptive"
+    },
+    "form_interaction": {
+      "field_focus_delay": 200,
+      "validation_reading_time": 1500,
+      "error_correction_behavior": "human_like",
+      "auto_complete_usage": 0.7
+    }
+  }
+}

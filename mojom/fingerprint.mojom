@@ -1,0 +1,211 @@
+// Copyright 2024 The NoveBrowse Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module novebrowse.mojom;
+
+// Canvas指纹保护配置
+struct CanvasConfig {
+  bool enabled;
+  bool add_noise;
+  double noise_level;
+  bool spoof_text_metrics;
+  bool protect_data_url;
+  bool protect_image_data;
+};
+
+// WebGL指纹保护配置
+struct WebGLConfig {
+  bool enabled;
+  string vendor;
+  string renderer;
+  string version;
+  string shading_language_version;
+  array<string> extensions;
+  map<string, string> parameters;
+  bool add_noise_to_buffers;
+  double buffer_noise_level;
+};
+
+// Navigator对象保护配置
+struct NavigatorConfig {
+  bool enabled;
+  string user_agent;
+  string platform;
+  array<string> languages;
+  int32 hardware_concurrency;
+  uint64 device_memory;
+  bool hide_webdriver;
+  bool spoof_plugins;
+  array<string> mime_types;
+};
+
+// 音频指纹保护配置
+struct AudioConfig {
+  bool enabled;
+  bool add_noise;
+  double noise_level;
+  bool protect_analyser_node;
+  bool protect_offline_context;
+  int32 sample_rate;
+  int32 buffer_size;
+};
+
+// 字体指纹保护配置
+struct FontConfig {
+  bool enabled;
+  bool spoof_enumeration;
+  bool spoof_metrics;
+  array<string> available_fonts;
+  map<string, double> font_metrics_offsets;
+};
+
+// WebRTC保护配置
+struct WebRTCConfig {
+  bool enabled;
+  bool mask_local_ips;
+  bool disable_webrtc;
+  string fake_public_ip;
+  array<string> allowed_ice_servers;
+  bool block_device_enumeration;
+};
+
+// 地理位置保护配置
+struct GeolocationConfig {
+  bool enabled;
+  bool spoof_location;
+  double latitude;
+  double longitude;
+  double accuracy;
+  bool block_high_accuracy;
+};
+
+// 屏幕指纹保护配置
+struct ScreenConfig {
+  bool enabled;
+  int32 width;
+  int32 height;
+  int32 color_depth;
+  int32 pixel_depth;
+  double device_pixel_ratio;
+  string orientation;
+};
+
+// 时区保护配置
+struct TimezoneConfig {
+  bool enabled;
+  string timezone;
+  int32 timezone_offset;
+  bool spoof_date_methods;
+};
+
+// WebDriver检测保护
+struct WebDriverProtection {
+  bool hide_webdriver_property;
+  bool hide_automation_flags;
+  bool spoof_chrome_runtime;
+  bool hide_selenium_variables;
+  array<string> blocked_properties;
+};
+
+// 自动化检测保护
+struct AutomationProtection {
+  bool hide_headless_flags;
+  bool spoof_user_interaction;
+  bool add_human_delays;
+  bool randomize_request_timing;
+  int32 min_delay_ms;
+  int32 max_delay_ms;
+};
+
+// JavaScript注入保护
+struct JSInjectionProtection {
+  bool detect_puppeteer;
+  bool detect_playwright;
+  bool detect_selenium;
+  bool block_detection_scripts;
+  array<string> blocked_script_patterns;
+};
+
+// 反检测配置
+struct AntiDetectionConfig {
+  bool enabled;
+  WebDriverProtection webdriver;
+  AutomationProtection automation;
+  JSInjectionProtection js_injection;
+};
+
+// 主指纹配置结构
+struct FingerprintConfig {
+  bool enabled;
+  string profile_name;
+  string device_profile;
+  string behavior_pattern;
+  
+  CanvasConfig canvas;
+  WebGLConfig webgl;
+  NavigatorConfig navigator;
+  AudioConfig audio;
+  FontConfig font;
+  WebRTCConfig webrtc;
+  GeolocationConfig geolocation;
+  ScreenConfig screen;
+  TimezoneConfig timezone;
+  AntiDetectionConfig anti_detection;
+  
+  array<string> custom_js_injections;
+  string created_at;
+  string updated_at;
+  string version;
+};
+
+// 指纹管理器接口
+interface FingerprintManager {
+  // 更新指纹配置
+  UpdateConfig(FingerprintConfig config) => (bool success);
+  
+  // 获取当前配置
+  GetConfig() => (FingerprintConfig config);
+  
+  // 启用/禁用指纹保护
+  SetEnabled(bool enabled) => (bool success);
+  
+  // 获取统计信息
+  GetStatistics() => (map<string, int32> stats);
+  
+  // 重置统计信息
+  ResetStatistics() => (bool success);
+};
+
+// 渲染器指纹管理器接口
+interface RendererFingerprintManager {
+  // 应用指纹配置到Frame
+  ApplyConfigToFrame(FingerprintConfig config) => (bool success);
+  
+  // 注入JavaScript保护脚本
+  InjectProtectionScripts(array<string> scripts) => (bool success);
+  
+  // 记录操作统计
+  RecordOperation(string operation, string details) => ();
+};
+
+// 指纹保护事件
+struct FingerprintProtectionEvent {
+  string event_type;
+  string frame_id;
+  string operation;
+  string details;
+  int64 timestamp;
+};
+
+// 事件监听器接口
+interface FingerprintEventListener {
+  // 指纹保护事件通知
+  OnProtectionEvent(FingerprintProtectionEvent event);
+  
+  // 配置更新通知
+  OnConfigUpdated(FingerprintConfig config);
+  
+  // 统计信息更新通知
+  OnStatisticsUpdated(map<string, int32> stats);
+};

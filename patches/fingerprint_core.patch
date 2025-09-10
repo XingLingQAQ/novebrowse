@@ -1,0 +1,308 @@
+diff --git a/chrome/browser/ui/views/frame/browser_view.cc b/chrome/browser/ui/views/frame/browser_view.cc
+index 1111111..2222222 100644
+--- a/chrome/browser/ui/views/frame/browser_view.cc
++++ b/chrome/browser/ui/views/frame/browser_view.cc
+@@ -50,6 +50,12 @@
+ #include "ui/views/widget/widget.h"
+ #include "ui/views/window/dialog_delegate.h"
+ 
+#if defined(OS_WIN)
+#include "novebrowse/windows/taskbar_badge.h"
+#include "base/command_line.h"
+#include "base/strings/utf_string_conversions.h"
+#endif
+
+ BrowserView::BrowserView() {
+   // existing ctor code ...
+ }
+@@
+ void BrowserView::GetAccessibleWindowTitle(std::u16string* title) const {
+   // existing code ...
+ }
+
+#if defined(OS_WIN)
+void BrowserView::AddedToWidget() {
+  views::ClientView::AddedToWidget();
+  HWND hwnd = (HWND)GetWidget()->GetNativeWindow()->GetHost()->GetAcceleratedWidget();
+  int badge = 0;
+  auto* cmd = base::CommandLine::ForCurrentProcess();
+  if (cmd->HasSwitch("window-badge")) {
+    std::string value = cmd->GetSwitchValueASCII("window-badge");
+    if (!value.empty()) {
+      badge = atoi(value.c_str());
+    } else {
+      // handle form: --window-badge 5 (unlikely here)
+      // fallback: keep zero
+    }
+  }
+  if (badge > 0) {
+    novebrowse::TaskbarBadge::SetOverlayNumber(hwnd, badge);
+  }
+}
+#endif
+
+diff --git a/content/browser/renderer_host/render_frame_host_impl.cc b/content/browser/renderer_host/render_frame_host_impl.cc
+index 1234567..abcdefg 100644
+--- a/content/browser/renderer_host/render_frame_host_impl.cc
++++ b/content/browser/renderer_host/render_frame_host_impl.cc
+@@ -50,6 +50,7 @@
+ #include "content/browser/renderer_host/render_widget_host_view_base.h"
+ #include "content/browser/web_contents/web_contents_impl.h"
+ #include "content/public/browser/browser_context.h"
++#include "novebrowse/fingerprint_manager.h"
+ 
+ namespace content {
+ 
+@@ -1500,6 +1501,12 @@ void RenderFrameHostImpl::OnDidCommitProvisionalLoad(
+   // Update the URL in the frame tree.
+   frame_tree_node_->SetCurrentURL(params.url);
+   
++  // Apply fingerprint configuration
++  if (novebrowse::FingerprintManager::IsEnabled()) {
++    auto config = novebrowse::FingerprintManager::GetConfigForFrame(this);
++    ApplyFingerprintConfig(config);
++  }
++  
+   // Notify observers about the commit.
+   NotifyObserversAboutCommit();
+ }
+@@ -2800,6 +2807,15 @@ void RenderFrameHostImpl::SendCommitNavigation(
+   GetAssociatedLocalFrame()->CommitNavigation(std::move(commit_params));
+ }
+ 
++void RenderFrameHostImpl::ApplyFingerprintConfig(
++    const novebrowse::FingerprintConfig& config) {
++  if (!config.enabled) return;
++  
++  // Send fingerprint configuration to renderer
++  GetAssociatedLocalFrame()->UpdateFingerprintConfig(
++      config.ToMojoStruct());
++}
++
+ }  // namespace content
+
+diff --git a/content/renderer/render_frame_impl.cc b/content/renderer/render_frame_impl.cc
+index 2345678..bcdefgh 100644
+--- a/content/renderer/render_frame_impl.cc
++++ b/content/renderer/render_frame_impl.cc
+@@ -80,6 +80,7 @@
+ #include "third_party/blink/public/web/web_local_frame.h"
+ #include "third_party/blink/public/web/web_navigation_params.h"
+ #include "third_party/blink/public/web/web_view.h"
++#include "novebrowse/renderer_fingerprint_manager.h"
+ 
+ namespace content {
+ 
+@@ -500,6 +501,11 @@ void RenderFrameImpl::Initialize() {
+   // Initialize frame-specific services
+   InitializeFrameServices();
+   
++  // Initialize fingerprint manager for this frame
++  fingerprint_manager_ = std::make_unique<novebrowse::RendererFingerprintManager>(
++      GetWebFrame());
++  fingerprint_manager_->Initialize();
++  
+   // Set up message routing
+   routing_id_ = RenderThread::Get()->GenerateRoutingID();
+ }
+@@ -1200,6 +1206,12 @@ void RenderFrameImpl::OnCommitNavigation(
+   // Apply navigation-specific settings
+   ApplyNavigationSettings(params);
+   
++  // Update fingerprint configuration if needed
++  if (fingerprint_manager_ && params.fingerprint_config) {
++    fingerprint_manager_->UpdateConfig(*params.fingerprint_config);
++    fingerprint_manager_->ApplyToFrame();
++  }
++  
+   // Commit the navigation
+   CommitNavigationInternal(std::move(params));
+ }
+@@ -2500,6 +2512,11 @@ void RenderFrameImpl::OnDestruct() {
+   delete this;
+ }
+ 
++void RenderFrameImpl::UpdateFingerprintConfig(
++    novebrowse::mojom::FingerprintConfigPtr config) {
++  fingerprint_manager_->UpdateConfig(std::move(config));
++}
++
+ }  // namespace content
+
+diff --git a/third_party/blink/renderer/core/frame/navigator.cc b/third_party/blink/renderer/core/frame/navigator.cc
+index 3456789..cdefghi 100644
+--- a/third_party/blink/renderer/core/frame/navigator.cc
++++ b/third_party/blink/renderer/core/frame/navigator.cc
+@@ -30,6 +30,7 @@
+ #include "third_party/blink/renderer/platform/language.h"
+ #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
+ #include "third_party/blink/renderer/platform/wtf/text/string_builder.h"
++#include "novebrowse/blink_fingerprint_manager.h"
+ 
+ namespace blink {
+ 
+@@ -150,6 +151,11 @@ String Navigator::userAgent() const {
+   if (!GetFrame())
+     return String();
+     
++  // Apply fingerprint spoofing if enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    return manager->GetSpoofedUserAgent();
++  }
++  
+   return GetFrame()->Loader().UserAgent();
+ }
+ 
+@@ -200,6 +206,11 @@ String Navigator::platform() const {
+   if (!GetFrame())
+     return String();
+     
++  // Apply platform spoofing if enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    return manager->GetSpoofedPlatform();
++  }
++  
+   return NavigatorID::platform();
+ }
+ 
+@@ -250,6 +261,11 @@ const Vector<String>& Navigator::languages() const {
+   if (!GetFrame())
+     return languages_;
+     
++  // Apply language spoofing if enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    return manager->GetSpoofedLanguages();
++  }
++  
+   if (languages_.IsEmpty()) {
+     languages_ = ComputeLanguages();
+   }
+@@ -300,6 +316,11 @@ int Navigator::hardwareConcurrency() const {
+   if (!GetFrame())
+     return 1;
+     
++  // Apply hardware concurrency spoofing if enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    return manager->GetSpoofedHardwareConcurrency();
++  }
++  
+   return std::max(1, static_cast<int>(base::SysInfo::NumberOfProcessors()));
+ }
+ 
+@@ -350,6 +371,11 @@ uint64_t Navigator::deviceMemory() const {
+   if (!GetFrame())
+     return 0;
+     
++  // Apply device memory spoofing if enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    return manager->GetSpoofedDeviceMemory();
++  }
++  
+   return base::SysInfo::AmountOfPhysicalMemoryMB() / 1024;
+ }
+ 
+@@ -400,6 +426,12 @@ bool Navigator::webdriver() const {
+   if (!GetFrame())
+     return false;
+     
++  // Hide webdriver property if fingerprint protection is enabled
++  if (auto* manager = novebrowse::BlinkFingerprintManager::FromFrame(GetFrame())) {
++    if (manager->ShouldHideWebDriver()) {
++      return false;
++    }
++  }
++  
+   return GetFrame()->GetSettings()->GetWebDriverEnabled();
+ }
+
+diff --git a/third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc b/third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc
+index 4567890..defghij 100644
+--- a/third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc
++++ b/third_party/blink/renderer/core/html/canvas/canvas_rendering_context_2d.cc
+@@ -50,6 +50,7 @@
+ #include "third_party/blink/renderer/platform/graphics/skia/skia_utils.h"
+ #include "third_party/blink/renderer/platform/heap/heap.h"
+ #include "third_party/skia/include/core/SkCanvas.h"
++#include "novebrowse/canvas_fingerprint_protection.h"
+ 
+ namespace blink {
+ 
+@@ -2000,6 +2001,12 @@ ImageData* CanvasRenderingContext2D::getImageData(
+   if (!origin_clean)
+     return nullptr;
+     
++  // Apply canvas fingerprint protection
++  if (novebrowse::CanvasFingerprintProtection::IsEnabled()) {
++    return novebrowse::CanvasFingerprintProtection::ProcessImageData(
++        image_data, GetCanvasRenderingContextHost());
++  }
++  
+   return image_data;
+ }
+ 
+@@ -2500,6 +2507,12 @@ String CanvasRenderingContext2D::toDataURL(
+   if (!GetCanvasRenderingContextHost()->OriginClean())
+     return String("data:,");
+     
++  // Apply canvas fingerprint protection to data URL
++  if (novebrowse::CanvasFingerprintProtection::IsEnabled()) {
++    return novebrowse::CanvasFingerprintProtection::ProcessDataURL(
++        result, GetCanvasRenderingContextHost());
++  }
++  
+   return result;
+ }
+ 
+@@ -3000,6 +3013,12 @@ TextMetrics* CanvasRenderingContext2D::measureText(const String& text) {
+   if (text.IsEmpty())
+     return TextMetrics::Create();
+     
++  // Apply text metrics spoofing if enabled
++  if (novebrowse::CanvasFingerprintProtection::IsEnabled()) {
++    return novebrowse::CanvasFingerprintProtection::ProcessTextMetrics(
++        metrics, GetCanvasRenderingContextHost());
++  }
++  
+   return metrics;
+ }
+
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+index 5678901..efghijk 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -80,6 +80,7 @@
+ #include "third_party/blink/renderer/platform/graphics/gpu/webgl_image_conversion.h"
+ #include "third_party/blink/renderer/platform/heap/heap.h"
+ #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
++#include "novebrowse/webgl_fingerprint_protection.h"
+ 
+ namespace blink {
+ 
+@@ -5000,6 +5001,12 @@ ScriptValue WebGLRenderingContextBase::getParameter(ScriptState* script_state,
+   if (isContextLost())
+     return ScriptValue::CreateNull(script_state->GetIsolate());
+     
++  // Apply WebGL parameter spoofing if enabled
++  if (novebrowse::WebGLFingerprintProtection::IsEnabled()) {
++    auto spoofed = novebrowse::WebGLFingerprintProtection::GetSpoofedParameter(
++        pname, this);
++    if (spoofed.has_value()) return spoofed.value();
++  }
++  
+   switch (pname) {
+     case GL_VENDOR:
+       return WebGLAny(script_state, String("WebKit"));
+@@ -5500,6 +5507,12 @@ String WebGLRenderingContextBase::getParameter(GLenum pname) {
+   if (isContextLost())
+     return String();
+     
++  // Apply WebGL string parameter spoofing
++  if (novebrowse::WebGLFingerprintProtection::IsEnabled()) {
++    auto spoofed = novebrowse::WebGLFingerprintProtection::GetSpoofedStringParameter(
++        pname, this);
++    if (!spoofed.IsEmpty()) return spoofed;
++  }
++  
+   switch (pname) {
+     case GL_VENDOR:
+       return String("WebKit");
