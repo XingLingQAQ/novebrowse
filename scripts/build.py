@@ -54,22 +54,52 @@ def main():
     os.environ["PATH"] = str(depot_tools) + os.pathsep + os.environ.get("PATH", "")
 
     is_windows = os.name == "nt"
-    fetch_cmd = str(depot_tools / ("fetch.bat" if is_windows else "fetch"))
     gclient_cmd = str(depot_tools / ("gclient.bat" if is_windows else "gclient"))
     ninja_cmd = str(depot_tools / ("ninja.exe" if is_windows else "ninja"))
+    gn_cmd = str(depot_tools / ("gn.bat" if is_windows else "gn"))
 
     # Fetch depot_tools if missing
     if not depot_tools.exists():
         run(["git", "clone", "https://chromium.googlesource.com/chromium/tools/depot_tools.git", str(depot_tools)])
 
-    # Fetch chromium (shallow), if missing
+    # Checkout chromium from GitHub mirror (shallow), if missing
     if not chromium_dir.exists():
         chromium_dir.mkdir(parents=True)
-        # 在 Windows 上通过 cmd 执行 .bat，避免找不到可执行的问题
-        if is_windows:
-            run(f'"{fetch_cmd}" --nohooks --no-history chromium', cwd=str(chromium_dir), use_shell=True)
-        else:
-            run([fetch_cmd, "--nohooks", "--no-history", "chromium"], cwd=str(chromium_dir))
+    src_dir = chromium_dir / "src"
+    if not src_dir.exists():
+        # Create .gclient that points to GitHub mirror for 'src'
+        gclient_text = (
+            'solutions = [\n'
+            '  {\n'
+            '    "name": "src",\n'
+            '    "url": "https://github.com/chromium/chromium.git",\n'
+            '    "deps_file": "DEPS",\n'
+            '    "managed": False,\n'
+            '    "custom_deps": {},\n'
+            '    "custom_vars": {},\n'
+            '  },\n'
+            ']\n'
+            'target_os = ["win"]\n'
+            'target_os_only = True\n'
+            'target_cpu = ["x64"]\n'
+            'with_branch_heads = False\n'
+            'with_tags = False\n'
+        )
+        (chromium_dir / ".gclient").write_text(gclient_text, encoding="utf-8")
+
+        # Shallow clone Github mirror for src
+        run([
+            "git", "clone", "--depth=1", "--filter=blob:none", "--no-tags",
+            "--single-branch", "--branch", "main",
+            "https://github.com/chromium/chromium.git", str(src_dir)
+        ])
+
+    # Mirror current NoveBrowse repo into chromium/src/novebrowse for integration
+    src_novebrowse = src_dir / "novebrowse"
+    if src_novebrowse.exists():
+        shutil.rmtree(src_novebrowse)
+    ignore_names = shutil.ignore_patterns("_work", "artifacts", ".git", ".github", "__pycache__")
+    shutil.copytree(nove_dir, src_novebrowse, ignore=ignore_names)
 
     # Configure platform-only in .gclient
     gclient_file = chromium_dir / ".gclient"
@@ -86,7 +116,6 @@ def main():
             with gclient_file.open("a", encoding="utf-8") as f:
                 f.writelines(append)
 
-    src_dir = chromium_dir / "src"
     # sync
     if is_windows:
         run(f'"{gclient_cmd}" sync --nohooks --no-history --shallow', cwd=str(src_dir), use_shell=True)
@@ -98,8 +127,20 @@ def main():
     else:
         run([gclient_cmd, "runhooks"], cwd=str(src_dir))
 
+    # Apply NoveBrowse patch (best-effort)
+    patch_path = src_novebrowse / "patches" / "fingerprint_core.patch"
+    if patch_path.exists():
+        if is_windows:
+            run(f'git apply --ignore-whitespace "{patch_path}"', cwd=str(src_dir), use_shell=True, check=False)
+        else:
+            run(["git", "apply", "--ignore-whitespace", str(patch_path)], cwd=str(src_dir), check=False)
+
     # Generate and build launcher only (fast target)
-    run([sys.executable, "tools/mb/mb.py", "gen", "out/Default", "--args=is_debug=false is_component_build=false"], cwd=str(src_dir))
+    # Generate build files with GN (mb may not accept --args here in Actions)
+    if is_windows:
+        run(f'"{gn_cmd}" gen out/Default --args="is_debug=false is_component_build=false"', cwd=str(src_dir), use_shell=True)
+    else:
+        run([gn_cmd, "gen", "out/Default", "--args=is_debug=false is_component_build=false"], cwd=str(src_dir))
     if Path(ninja_cmd).exists():
         if is_windows:
             run(f'"{ninja_cmd}" -C out/Default build_novebrowse', cwd=str(src_dir), use_shell=True)
